@@ -1,6 +1,8 @@
 # install.packages("readxl")
 
 library("readxl")
+
+# Read excel from Jaggia BA : Communicating with numbers
 myData <- read_excel("~/Downloads/Boston-MET/jaggia_ba_1e_ch02_data.xlsx", sheet = "Customers")
 
 
@@ -15,6 +17,8 @@ display_columns <- function(allData, message = " Columns: ") {
 
 sprintf(" Total number of rows: %d", nrow(myData))
 sprintf(" Total number of columns: %d", ncol(myData))
+print(paste(" Dimensions: ", paste(dim(myData), collapse = "x")))
+
 
 display_columns(myData)
 
@@ -29,9 +33,6 @@ print(" ---------------------- ")
 # Recency score
 # convert by using as.numeric()
 myData$DaysSinceLastReverse <- as.numeric(myData$DaysSinceLast * -1)
-
-# col_names <- names(myData)
-# sprintf(" New Columns: %s", paste(col_names, collapse = ", "))
 display_columns(myData, " New Columns:")
 
 # Create 5 bins for Recency Frequenct Monetary (RFM) for DaysSinceLastReverse, NumOfOrders, Spending2018
@@ -50,9 +51,15 @@ monetaryBins <- quantile(myData$Spending2018, probs = seq(0, 1, by = 0.20), name
 print(" Monetary Bins: ")
 names(monetaryBins)
 
-myData$Recency <- cut(myData$DaysSinceLastReverse, breaks = recencyBins, labels = c("1", "2", "3", "4", "5"), include.lowest = TRUE, right = FALSE)
+myData$Recency <- cut(myData$DaysSinceLastReverse,
+                      breaks = recencyBins,
+                      labels = c("1", "2", "3", "4", "5"), include.lowest = TRUE, right = FALSE
+)
 
+print(" Recency: ")
+myData$Recency
 table(myData$Recency)
+print(" Recency Ends.... ")
 
 myData$Frequency <- cut(myData$NumOfOrders, breaks = freqencyBins, labels = c("1", "2", "3", "4", "5"), include.lowest = TRUE, right = FALSE)
 
