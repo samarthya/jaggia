@@ -75,3 +75,10 @@ row.names(myData)
  [9] "Spending2017"  "Spending2018"  "NumOfOrders"   "DaysSinceLast"
 [13] "Satisfaction"  "Channel"
 ```
+
+#### Getting dimensions for data frame
+
+```bash
+> dim(myData)
+[1] 200  14
+```
