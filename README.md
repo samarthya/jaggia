@@ -81,4 +81,29 @@ row.names(myData)
 ```bash
 > dim(myData)
 [1] 200  14
+
+> m <- dim(myData)
+> names(m) <- c("rows", "columns")
+
+> m
+   rows columns
+    200      14
+
+> names(m)
+[1] "rows"    "columns"
+
+> attributes(m)
+$names
+[1] "rows"    "columns"
+
+> as.matrix(m)
+        [,1]
+rows     200
+columns   14
+
+> y <- as.matrix(m)
+> y
+        [,1]
+rows     200
+columns   14
 ```
