@@ -5,6 +5,15 @@ library(lubridate) # For handling dates
 library(scales) # For formatting numbers in plots
 library(broom)
 
+# file_paths <- list(
+#   transactions = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NYC_TRANSACTION_DATA.csv",
+#   neighborhoods = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NEIGHBORHOOD.csv",
+#   boroughs = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BOROUGH.csv",
+#   building_class = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BUILDING_CLASS.csv"
+# )
+
+# data <- lapply(file_paths, read.csv)
+
 # Read all the necessary data files
 # Each file contains different aspects of NYC real estate information
 transactions <- read.csv(
@@ -16,24 +25,46 @@ transactions <- read.csv(
   # na.omit = TRUE
 ) # NYC_TRANSACTION_DATA.csv
 
+neighborhoods <- read.csv(
+  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NEIGHBORHOOD.csv"
+) # NEIGHBORHOOD.csv
+
+building_class <- read.csv(
+  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BUILDING_CLASS.csv"
+) # BUILDING_CLASS.csv
+
+boroughs <- read.csv(
+  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BOROUGH.csv"
+) # BOROUGH.csv
+
 transactions <- transactions %>%
   filter(
     !is.na(SALE_DATE) # Remove rows where SALE_DATE is NA
+  ) %>%
+  mutate(
+    SALE_PRICE = as.numeric(SALE_PRICE), # Convert SALE_PRICE to numeric
+    GROSS_SQUARE_FEET = as.numeric(GROSS_SQUARE_FEET)
+  )
+
+
+transactions <- transactions %>%
+  mutate(
+    SALE_PRICE = ifelse(
+      is.na(SALE_PRICE),
+      median(SALE_PRICE,
+        na.rm = TRUE
+      ), SALE_PRICE
+    ),
+    GROSS_SQUARE_FEET = ifelse(
+      is.na(GROSS_SQUARE_FEET),
+      median(GROSS_SQUARE_FEET,
+        na.rm = TRUE
+      ),
+      GROSS_SQUARE_FEET
+    )
   )
 
 str(transactions)
-# transactions <- transactions %>% replace(is.na(.), 0)
-transactions$SALE_PRICE <- as.numeric(transactions$SALE_PRICE)
-
-
-median_sale_price <- median(transactions$SALE_PRICE, na.rm = TRUE)
-transactions$SALE_PRICE[is.na(transactions$SALE_PRICE)] <- median_sale_price
-
-
-median_gross_sqft <- median(transactions$GROSS_SQUARE_FEET, na.rm = TRUE)
-transactions$GROSS_SQUARE_FEET[
-  is.na(transactions$GROSS_SQUARE_FEET)
-] <- median_gross_sqft
 
 
 # Columns read
@@ -46,9 +77,6 @@ cat(
 
 # summarise(transactions$SALE_PRICE)
 
-neighborhoods <- read.csv(
-  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NEIGHBORHOOD.csv"
-) # NEIGHBORHOOD.csv
 
 cat(
   " Columns read: ", ncol(neighborhoods), "\n",
@@ -57,9 +85,6 @@ cat(
 # summarise(neighborhoods$NEIGHBORHOOD_NAME)
 
 
-boroughs <- read.csv(
-  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BOROUGH.csv"
-) # BOROUGH.csv
 
 cat(
   " Columns read: ", ncol(boroughs), "\n",
@@ -67,9 +92,7 @@ cat(
 )
 
 
-building_class <- read.csv(
-  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BUILDING_CLASS.csv"
-) # BUILDING_CLASS.csv
+
 
 cat(
   " Columns read: ", ncol(building_class), "\n",
