@@ -37,6 +37,7 @@ boroughs <- read.csv(
   "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BOROUGH.csv"
 ) # BOROUGH.csv
 
+# Time to do some data cleaning
 transactions <- transactions %>%
   filter(
     !is.na(SALE_DATE) # Remove rows where SALE_DATE is NA
@@ -66,43 +67,27 @@ transactions <- transactions %>%
 
 str(transactions)
 
-
 # Columns read
 cat(
-  " Columns read: ", ncol(transactions), "\n",
-  " Column names: ", names(transactions), "\n"
+  " Transactions columns read: ", ncol(transactions), "\n",
+  " Transactions column names: ", names(transactions), "\n",
+  " Neighborhoods columns read: ", ncol(neighborhoods), "\n",
+  " Neighborhoods columns names: ", names(neighborhoods), "\n",
+  " Boroughs columns read: ", ncol(boroughs), "\n",
+  " Boroughs columns names: ", names(boroughs), "\n",
+  " Building columns read: ", ncol(building_class), "\n",
+  " Building columns names: ", names(building_class), "\n"
 )
 
-# transactions$SALE_PRICE <- as.numeric(transactions$SALE_PRICE)
 
+# transactions$SALE_PRICE <- as.numeric(transactions$SALE_PRICE)
 # summarise(transactions$SALE_PRICE)
 
 
-cat(
-  " Columns read: ", ncol(neighborhoods), "\n",
-  "Column names: ", names(neighborhoods), "\n"
-)
-# summarise(neighborhoods$NEIGHBORHOOD_NAME)
-
-
-
-cat(
-  " Columns read: ", ncol(boroughs), "\n",
-  "Column names: ", names(boroughs), "\n"
-)
-
-
-
-
-cat(
-  " Columns read: ", ncol(building_class), "\n",
-  "Column names: ", names(building_class), "\n"
-)
-
 str(building_class)
+
 # Q.1 - Compute the average price of 1 square foot of
 # residential real estate in Ridgewood for each year.
-
 # Join and filter for Ridgewood properties
 ridgewood_data <- transactions %>%
   inner_join(neighborhoods, by = "NEIGHBORHOOD_ID") %>%
@@ -119,15 +104,21 @@ ridgewood_data <- transactions %>%
     # SALE_PRICE / GROSS_SQUARE_FEET < 10000 # Remove extreme outliers
   )
 
+
 summarise(ridgewood_data)
 
 # Convert sale date and calculate price per square foot
-ridgewood_data$SALE_DATE <- as.Date(ridgewood_data$SALE_DATE)
-ridgewood_data$YEAR <- format(ridgewood_data$SALE_DATE, "%Y")
+ridgewood_data <- ridgewood_data %>%
+  mutate(
+    SALE_DATE = as.Date(SALE_DATE),
+    YEAR = format(SALE_DATE, "%Y"),
+    price_per_sqft = SALE_PRICE / GROSS_SQUARE_FEET
+  )
 
-# New Column
-ridgewood_data$price_per_sqft <-
-  ridgewood_data$SALE_PRICE / ridgewood_data$GROSS_SQUARE_FEET
+# ridgewood_data$SALE_DATE <- as.Date(ridgewood_data$SALE_DATE)
+# ridgewood_data$YEAR <- format(ridgewood_data$SALE_DATE, "%Y")
+# ridgewood_data$price_per_sqft <-
+#   ridgewood_data$SALE_PRICE / ridgewood_data$GROSS_SQUARE_FEET
 
 # Calculate yearly averages
 yearly_trends <- ridgewood_data %>%
@@ -177,3 +168,4 @@ ggplot(yearly_trends, aes(x = as.numeric(YEAR), y = avg_price_per_sqft)) +
 # average price per square foot over time in Ridgewood.
 trend_model <- lm(avg_price_per_sqft ~ as.numeric(YEAR), data = yearly_trends)
 trend_stats <- tidy(trend_model)
+print(trend_stats)

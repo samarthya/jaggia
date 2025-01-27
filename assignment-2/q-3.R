@@ -95,3 +95,4 @@ ggplot(yearly_trends, aes(x = as.numeric(YEAR), y = avg_price_per_sqft)) +
 
 # Calculate trend statistics
 trend_model <- lm(avg_price_per_sqft ~ as.numeric(YEAR), data = yearly_trends)
+summary(trend_model)
