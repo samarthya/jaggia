@@ -5,37 +5,42 @@ library(lubridate) # For handling dates
 library(scales) # For formatting numbers in plots
 library(broom)
 
-# file_paths <- list(
-#   transactions = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NYC_TRANSACTION_DATA.csv",
-#   neighborhoods = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NEIGHBORHOOD.csv",
-#   boroughs = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BOROUGH.csv",
-#   building_class = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BUILDING_CLASS.csv"
-# )
+file_paths <- list(
+  transactions = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NYC_TRANSACTION_DATA.csv", # nolint
+  neighborhoods = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NEIGHBORHOOD.csv",
+  boroughs = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BOROUGH.csv",
+  building_class = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BUILDING_CLASS.csv"
+)
 
-# data <- lapply(file_paths, read.csv)
+data <- lapply(file_paths, read.csv) # Applies a function to a list
+
+transactions <- data$transactions
+neighborhoods <- data$neighborhoods
+boroughs <- data$boroughs
+building_class <- data$building_class
 
 # Read all the necessary data files
 # Each file contains different aspects of NYC real estate information
-transactions <- read.csv(
-  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NYC_TRANSACTION_DATA.csv"
-  # colClasses = c(
-  #   "SALE_PRICE" = "numeric",
-  #   "GROSS_SQUARE_FEET" = "numeric"
-  # ),
-  # na.omit = TRUE
-) # NYC_TRANSACTION_DATA.csv
+# transactions <- read.csv(
+#   "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NYC_TRANSACTION_DATA.csv"
+#   # colClasses = c(
+#   #   "SALE_PRICE" = "numeric",
+#   #   "GROSS_SQUARE_FEET" = "numeric"
+#   # ),
+#   # na.omit = TRUE
+# ) # NYC_TRANSACTION_DATA.csv
 
-neighborhoods <- read.csv(
-  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NEIGHBORHOOD.csv"
-) # NEIGHBORHOOD.csv
+# neighborhoods <- read.csv(
+#   "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NEIGHBORHOOD.csv"
+# ) # NEIGHBORHOOD.csv
 
-building_class <- read.csv(
-  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BUILDING_CLASS.csv"
-) # BUILDING_CLASS.csv
+# building_class <- read.csv(
+#   "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BUILDING_CLASS.csv"
+# ) # BUILDING_CLASS.csv
 
-boroughs <- read.csv(
-  "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BOROUGH.csv"
-) # BOROUGH.csv
+# boroughs <- read.csv(
+#   "~/Downloads/Boston-MET/Assignment-2/NYC_RE/BOROUGH.csv"
+# ) # BOROUGH.csv
 
 # Time to do some data cleaning
 transactions <- transactions %>%
@@ -44,7 +49,8 @@ transactions <- transactions %>%
   ) %>%
   mutate(
     SALE_PRICE = as.numeric(SALE_PRICE), # Convert SALE_PRICE to numeric
-    GROSS_SQUARE_FEET = as.numeric(GROSS_SQUARE_FEET)
+    GROSS_SQUARE_FEET = as.numeric(GROSS_SQUARE_FEET),
+    YEAR = year(SALE_DATE)
   )
 
 
@@ -163,9 +169,11 @@ ggplot(yearly_trends, aes(x = as.numeric(YEAR), y = avg_price_per_sqft)) +
     axis.text = element_text(size = 10)
   )
 
+
 # Calculate trend statistics
 # performs a linear regression to analyze the trend of
 # average price per square foot over time in Ridgewood.
 trend_model <- lm(avg_price_per_sqft ~ as.numeric(YEAR), data = yearly_trends)
 trend_stats <- tidy(trend_model)
 print(trend_stats)
+
