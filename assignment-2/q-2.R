@@ -34,10 +34,7 @@ transactions <- transactions %>%
     SALE_DATE = as.Date(SALE_DATE),
     GROSS_SQUARE_FEET = as.numeric(GROSS_SQUARE_FEET),
     YEAR = year(SALE_DATE)
-  )
-
-
-transactions <- transactions %>%
+  ) %>%
   mutate(
     SALE_PRICE = ifelse(
       is.na(SALE_PRICE),
@@ -69,8 +66,6 @@ cat(
 )
 
 
-str(building_class)
-
 # Q.1 - Compute the average price of 1 square foot of
 # residential real estate in Ridgewood for each year.
 # Join and filter for Ridgewood properties
@@ -92,20 +87,6 @@ ridgewood_data <- transactions %>%
     price_per_sqft = SALE_PRICE / GROSS_SQUARE_FEET
   )
 
-str(building_class)
-summarise(ridgewood_data)
-
-# # Convert sale date and calculate price per square foot
-# ridgewood_data <- ridgewood_data %>%
-#   mutate(
-#     price_per_sqft = SALE_PRICE / GROSS_SQUARE_FEET
-#   )
-
-# ridgewood_data$SALE_DATE <- as.Date(ridgewood_data$SALE_DATE)
-# ridgewood_data$YEAR <- format(ridgewood_data$SALE_DATE, "%Y")
-# ridgewood_data$price_per_sqft <-
-#   ridgewood_data$SALE_PRICE / ridgewood_data$GROSS_SQUARE_FEET
-
 # Calculate yearly averages
 yearly_trends <- ridgewood_data %>%
   group_by(YEAR) %>% # groups by year
@@ -117,7 +98,8 @@ yearly_trends <- ridgewood_data %>%
   ) %>%
   arrange(YEAR)
 
-summary(yearly_trends)
+str(yearly_trends)
+summarise(yearly_trends)
 
 # Create visualization with trend line
 ggplot(yearly_trends, aes(x = as.numeric(YEAR), y = avg_price_per_sqft)) +
