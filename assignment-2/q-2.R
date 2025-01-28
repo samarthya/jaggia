@@ -101,36 +101,66 @@ yearly_trends <- ridgewood_data %>%
 str(yearly_trends)
 summarise(yearly_trends)
 
-# Create visualization with trend line
+# # Create a line plot with a trendline
+# ggplot(yearly_trends, aes(x = as.numeric(YEAR), y = avg_price_per_sqft)) +
+#   # Add a line for the average price per square foot
+#   geom_line(color = "#2C3E50", size = 1) +
+#   # Add points for each year
+#   geom_point(size = 3, color = "#E74C3C") +
+#   # Add a trendline
+#   geom_smooth(method = "lm",
+#     color = "#3498DB",
+#     linetype = "dashed",
+#     se = FALSE) +
+#   # Customize the theme
+#   theme_minimal() +
+#   # Add labels and title
+#   labs(
+#     title = "Average Price per Square Foot in Ridgewood (2003-2022)",
+#     subtitle = "Trend of Residential Real Estate Prices Over Time",
+#     x = "Year",
+#     y = "Price per Square Foot ($)"
+#   ) +
+#   # Format the y-axis as dollars
+#   scale_y_continuous(labels = dollar_format()) +
+#   # Customize text and gridlines
+#   theme(
+#     plot.title = element_text(size = 16, face = "bold"),
+#     plot.subtitle = element_text(size = 12),
+#     axis.title = element_text(size = 12),
+#     axis.text = element_text(size = 10),
+#     panel.grid.major = element_line(color = "gray90"),
+#     panel.grid.minor = element_blank()
+#   )
+
+
+
+# Create a bar plot with a trendline
 ggplot(yearly_trends, aes(x = as.numeric(YEAR), y = avg_price_per_sqft)) +
-  # Add actual data points
-  geom_point(size = 4, color = "#2C3E50") +
-  # Add error bars showing standard deviation
-  geom_errorbar(
-    aes(
-      ymin = avg_price_per_sqft - std_dev,
-      ymax = avg_price_per_sqft + std_dev
-    ),
-    width = 0.2, color = "#7F8C8D", alpha = 0.5
-  ) +
-  # Add trend line
-  geom_smooth(method = "lm", color = "#E74C3C", se = TRUE) +
-  # Customize appearance
+  # Add bars for each year
+  geom_bar(stat = "identity", fill = "#2C3E50", alpha = 0.7) +
+  # Add a trendline
+  geom_smooth(method = "lm", color = "#E74C3C", linetype = "dashed", se = FALSE) +
+  # Customize the theme
   theme_minimal() +
+  # Add labels and title
   labs(
-    title = "Ridgewood Real Estate Price",
-    subtitle = "Average Price per Square Foot with Trend Line",
+    title = "Average Price per Square Foot in Ridgewood (2003-2023)",
+    subtitle = "Trend of Residential Real Estate Prices Over Time",
     x = "Year",
-    y = "Price per Square Foot ($)",
+    y = "Price per Square Foot ($)"
   ) +
+  # Format the y-axis as dollars
   scale_y_continuous(labels = dollar_format()) +
+  # Customize text and gridlines
   theme(
     plot.title = element_text(size = 16, face = "bold"),
     plot.subtitle = element_text(size = 12),
     axis.title = element_text(size = 12),
-    axis.text = element_text(size = 10)
-  )
-
+    axis.text = element_text(size = 10),
+    panel.grid.major = element_line(color = "gray90"),
+    panel.grid.minor = element_blank()
+  ) + geom_text(aes(label = ifelse(YEAR == 2020, "COVID-19", "")), vjust = -1, hjust = 1, color = "red")
 
 # Calculate trend statistics
 # performs a linear regression to analyze the trend of
