@@ -10,7 +10,7 @@ price_breaks <- seq(1.70, 3.40, by = 0.30)
 
 # Read the data
 gas_data <- tryCatch(
-  read_excel("Gas_2019.xlsx"),
+  read_excel("jaggia_ba_1e_ch03_data.xlsx", sheet = "Gas_2019"),
   error = function(e) {
     stop("Error reading file: ", e$message)
   }
