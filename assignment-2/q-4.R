@@ -3,6 +3,9 @@ library(dplyr) # For data manipulation
 library(ggplot2) # For creating visualizations
 library(scales) # For formatting numbers in plots
 library(broom)
+# library(ggradar) # Requires ggradar package
+
+x11()
 
 # Read all the necessary data files
 # Each file contains different aspects of NYC real estate information
@@ -49,6 +52,8 @@ filtered_data <- transactions %>%
   # Keep only last 5 years
   filter(YEAR >= max(YEAR) - 4)
 
+print(filtered_data, n = 10, width =  200, na.print = "NA")
+
 # Get Ridgewood's borough
 ridgewood_borough <- filtered_data %>%
   filter(toupper(NEIGHBORHOOD_NAME) == "RIDGEWOOD") %>%
@@ -80,39 +85,69 @@ selected_trends <- filtered_data %>%
   )
 
 # Create enhanced visualization
-ggplot(
-  selected_trends,
-  aes(
-    x = as.numeric(YEAR),
-    y = avg_price_per_sqft,
-    color = NEIGHBORHOOD_NAME
-  )
-) +
-  geom_line(size = 1.2) +
-  geom_point(aes(size = n_transactions)) +
-  scale_color_manual(values = c(
-    "RIDGEWOOD" = "#E74C3C", # Highlight Ridgewood in red
-    setNames(
-      scales::hue_pal()(length(top_neighborhoods) - 1),
-      setdiff(top_neighborhoods, "RIDGEWOOD")
-    )
-  )) +
-  theme_minimal() +
+# ggplot(
+#   selected_trends,
+#   aes(
+#     x = as.numeric(YEAR),
+#     y = avg_price_per_sqft,
+#     color = NEIGHBORHOOD_NAME
+#   )
+# ) +
+#   geom_line(size = 1.2) +
+#   geom_point(aes(size = n_transactions)) +
+#   scale_color_manual(values = c(
+#     "RIDGEWOOD" = "#E74C3C", # Highlight Ridgewood in red
+#     setNames(
+#       scales::hue_pal()(length(top_neighborhoods) - 1),
+#       setdiff(top_neighborhoods, "RIDGEWOOD")
+#     )
+#   )) +
+#   theme_minimal() +
+#   labs(
+#     title = "Ridgewood vs Top Nearby Neighborhoods: Last 5 Years",
+#     subtitle = "Average Price per Square Foot Comparison",
+#     x = "Year",
+#     y = "Price per Square Foot ($)",
+#     color = "Neighborhood",
+#     size = "Number of\nTransactions"
+#   ) +
+#   scale_y_continuous(labels = dollar_format()) +
+#   theme(
+#     legend.position = "right",
+#     plot.title = element_text(size = 16, face = "bold"),
+#     plot.subtitle = element_text(size = 12),
+#     axis.title = element_text(size = 12)
+#   )
+
+# ggplot(
+#   filtered_data %>% filter(NEIGHBORHOOD_NAME %in% top_neighborhoods),
+#   aes(x = NEIGHBORHOOD_NAME, y = SALE_PRICE / GROSS_SQUARE_FEET, fill = NEIGHBORHOOD_NAME)
+# ) +
+#   geom_boxplot() +
+#   labs(
+#     title = "Distribution of Price per Square Foot by Neighborhood",
+#     x = "Neighborhood",
+#     y = "Price per Square Foot ($)"
+#   ) +
+#   scale_y_continuous(labels = dollar_format()) +
+#   theme_minimal()
+
+ggplot(selected_trends, aes(x = as.factor(YEAR), y = NEIGHBORHOOD_NAME, fill = avg_price_per_sqft)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red", labels = dollar_format()) +
   labs(
-    title = "Ridgewood vs Top Nearby Neighborhoods: Last 5 Years",
-    subtitle = "Average Price per Square Foot Comparison",
+    title = "Average Price per SqFt by Neighborhood and Year",
     x = "Year",
-    y = "Price per Square Foot ($)",
-    color = "Neighborhood",
-    size = "Number of\nTransactions"
+    y = "Neighborhood",
+    fill = "Price per Sqft ($)"
   ) +
-  scale_y_continuous(labels = dollar_format()) +
-  theme(
-    legend.position = "right",
-    plot.title = element_text(size = 16, face = "bold"),
-    plot.subtitle = element_text(size = 12),
-    axis.title = element_text(size = 12)
-  )
+  theme_minimal()
+
+dev.hold()
+
+# selected_trends_wide <- selected_trends %>%
+#   pivot_wider(names_from = YEAR, values_from = avg_price_per_sqft)
+# ggradar(selected_trends_wide)
 
 # Calculate summary statistics for clear comparison
 neighborhood_summary <- filtered_data %>%
@@ -130,3 +165,4 @@ neighborhood_summary <- filtered_data %>%
   arrange(desc(avg_price_per_sqft))
 
 print(neighborhood_summary)
+Sys.sleep(30)

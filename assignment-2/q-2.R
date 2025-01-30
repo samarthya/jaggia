@@ -5,6 +5,9 @@ library(lubridate) # For handling dates
 library(scales) # For formatting numbers in plots
 library(broom)
 
+# If running in VS Code
+X11()
+
 file_paths <- list(
   transactions = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NYC_TRANSACTION_DATA.csv", # nolint
   neighborhoods = "~/Downloads/Boston-MET/Assignment-2/NYC_RE/NEIGHBORHOOD.csv",
@@ -53,17 +56,17 @@ transactions <- transactions %>%
 
 str(transactions)
 
-# Columns read
-cat(
-  " Transactions columns read: ", ncol(transactions), "\n",
-  " Transactions column names: ", names(transactions), "\n",
-  " Neighborhoods columns read: ", ncol(neighborhoods), "\n",
-  " Neighborhoods columns names: ", names(neighborhoods), "\n",
-  " Boroughs columns read: ", ncol(boroughs), "\n",
-  " Boroughs columns names: ", names(boroughs), "\n",
-  " Building columns read: ", ncol(building_class), "\n",
-  " Building columns names: ", names(building_class), "\n"
-)
+# # Columns read
+# cat(
+#   " Transactions columns read: ", ncol(transactions), "\n",
+#   " Transactions column names: ", names(transactions), "\n",
+#   " Neighborhoods columns read: ", ncol(neighborhoods), "\n",
+#   " Neighborhoods columns names: ", names(neighborhoods), "\n",
+#   " Boroughs columns read: ", ncol(boroughs), "\n",
+#   " Boroughs columns names: ", names(boroughs), "\n",
+#   " Building columns read: ", ncol(building_class), "\n",
+#   " Building columns names: ", names(building_class), "\n"
+# )
 
 
 # Q.1 - Compute the average price of 1 square foot of
@@ -99,7 +102,7 @@ yearly_trends <- ridgewood_data %>%
   arrange(YEAR)
 
 str(yearly_trends)
-summarise(yearly_trends)
+print(yearly_trends, n = 20, na.print = "NA",  width = 200)
 
 # # Create a line plot with a trendline
 # ggplot(yearly_trends, aes(x = as.numeric(YEAR), y = avg_price_per_sqft)) +
@@ -162,9 +165,12 @@ ggplot(yearly_trends, aes(x = as.numeric(YEAR), y = avg_price_per_sqft)) +
     panel.grid.minor = element_blank()
   ) + geom_text(aes(label = ifelse(YEAR == 2020, "COVID-19", "")), vjust = -1, hjust = 1, color = "red")
 
+dev.hold()
+
 # Calculate trend statistics
 # performs a linear regression to analyze the trend of
 # average price per square foot over time in Ridgewood.
 trend_model <- lm(avg_price_per_sqft ~ as.numeric(YEAR), data = yearly_trends)
 trend_stats <- tidy(trend_model)
 print(trend_stats)
+Sys.sleep(10)
