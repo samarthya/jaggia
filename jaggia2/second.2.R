@@ -5,10 +5,10 @@ library(ggplot2)
 
 setwd("~/Downloads/Boston-MET/Jaggia/Jaggia2")
 
-# Create price breaks for the frequency distribution and histogram
-price_breaks <- seq(1.70, 3.40, by = 0.30)
+# X11()
 
-# Read the data
+# read the data in case the file is not there
+# throw an error
 gas_data <- tryCatch(
   read_excel("jaggia_ba_1e_ch03_data.xlsx", sheet = "Gas_2019"),
   error = function(e) {
@@ -16,36 +16,34 @@ gas_data <- tryCatch(
   }
 )
 
-# Descriptive statistics
-mean_price <- mean(gas_data$Price)
-median_price <- median(gas_data$Price)
-sd_price <- sd(gas_data$Price)
+str(gas_data)
+
+# Create price breaks for the frequency distribution and histogram
+price_breaks <- seq(1.70, 3.40, by = 0.30)
+
+# Calculate descriptive statistics
+mean_price <- mean(
+  gas_data$Price # Mean
+)
+
+median_price <- median(
+  gas_data$Price # Median
+)
+
+sd_price <- sd(
+  gas_data$Price # Standard deviation
+)
+
 price_mode <- as.numeric(
   names(
     which.max(table(gas_data$Price)) # Mode
   )
 )
-#
 
 
-
-# Create frequency distribution table using cut()
-freq_dist <- cut(gas_data$Price,
-  breaks = price_breaks,
-  right = TRUE,
-  include.lowest = TRUE
-)
-
-freq_table <- table(freq_dist)
-
-# Create a histogram using ggplot2
-histogram_plot <- ggplot(gas_data, aes(x = Price)) +
-  geom_histogram(binwidth = 0.3, fill = "lightblue", color = "black") +
-  labs(title = "Histogram of Gas Prices", x = "Price ($)", y = "Frequency") +
-  theme_classic()
 
 # Create a histogram with density curve, mean, median, and mode lines
-histogram_plot_with_density <- ggplot(gas_data, aes(x = Price)) +
+histogram_plot <- ggplot(gas_data, aes(x = Price)) +
   geom_histogram(
     aes(y = ..density..),
     binwidth = 0.3,
@@ -103,50 +101,9 @@ histogram_plot_with_density <- ggplot(gas_data, aes(x = Price)) +
   ) # Annotate
 
 
-# Calculate number of states with prices > $2.60 and add explanation
-high_price_threshold <- 2.60 # Define a meaningful variable for clarity.
-num_high_prices <- sum(gas_data$Price > high_price_threshold)
-
-# Calculate skewness
-price_skewness <- skewness(gas_data$Price)
-
-
-# Print formatted results and explanations
-cat("Summary Statistics:\n")
-cat(sprintf("Mean Price: $%.2f\n", mean_price))
-cat(sprintf("Median Price: $%.2f\n", median_price))
-cat(sprintf("Standard Deviation: $%.2f\n", sd_price))
-
-# Find and print the interval with the highest frequency
-max_interval <- names(which.max(freq_table))
-cat(sprintf("Interval with highest frequency: %s\n", max_interval))
-
-cat("\nFrequency Distribution:\n")
-print(freq_table)
-
-cat(sprintf(
-  "\nNumber of states with prices > $%.2f: %d\n",
-  high_price_threshold,
-  num_high_prices
-))
-
-cat(sprintf("Skewness: %.3f\n", price_skewness))
-
-if (price_skewness > 0) {
-  cat("The distribution is positively skewed.\n")
-} else {
-  cat("The distribution is negatively skewed.\n")
-}
-
-X11()
-# Display the ggplot
 print(histogram_plot)
-X11()
-print(histogram_plot_with_density)
 
 file_path <- sprintf("%s/gas_price_histogram_with_density.png", getwd())
-
-# Save the plot (optional)
 save_result <- tryCatch(
   {
     ggsave(
@@ -173,6 +130,12 @@ if (save_result) {
 }
 
 
+# Print summary statistics (optional)
+cat("Summary Statistics:\n")
+cat(sprintf("Mean Price: $%.2f\n", mean_price))
+cat(sprintf("Median Price: $%.2f\n", median_price))
+cat(sprintf("Mode Price: $%.2f\n", price_mode)) # Print the mode.
+cat(sprintf("Standard Deviation: $%.2f\n", sd_price))
 
-dev.hold()
-Sys.sleep(30)
+# dev.hold()
+# Sys.sleep(30)
